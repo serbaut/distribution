@@ -24,31 +24,35 @@ var swiftDriverConstructor func(prefix string) (*Driver, error)
 
 func init() {
 	var (
-		username           string
-		password           string
-		authURL            string
-		tenant             string
-		tenantID           string
-		domain             string
-		domainID           string
-		tenantDomain       string
-		tenantDomainID     string
-		trustID            string
-		container          string
-		region             string
-		AuthVersion        int
-		endpointType       string
-		insecureSkipVerify bool
-		secretKey          string
-		accessKey          string
-		containerKey       bool
-		tempURLMethods     []string
+		username                    string
+		password                    string
+		applicationCredentialId     string
+		applicationCredentialSecret string
+		authURL                     string
+		tenant                      string
+		tenantID                    string
+		domain                      string
+		domainID                    string
+		tenantDomain                string
+		tenantDomainID              string
+		trustID                     string
+		container                   string
+		region                      string
+		AuthVersion                 int
+		endpointType                string
+		insecureSkipVerify          bool
+		secretKey                   string
+		accessKey                   string
+		containerKey                bool
+		tempURLMethods              []string
 
 		swiftServer *swifttest.SwiftServer
 		err         error
 	)
 	username = os.Getenv("SWIFT_USERNAME")
 	password = os.Getenv("SWIFT_PASSWORD")
+	applicationCredentialId = os.Getenv("SWIFT_APPLICATION_CREDENTIAL_ID")
+	applicationCredentialSecret = os.Getenv("SWIFT_APPLICATION_CREDENTIAL_SECRET")
 	authURL = os.Getenv("SWIFT_AUTH_URL")
 	tenant = os.Getenv("SWIFT_TENANT_NAME")
 	tenantID = os.Getenv("SWIFT_TENANT_ID")
@@ -87,6 +91,8 @@ func init() {
 		parameters := Parameters{
 			username,
 			password,
+			applicationCredentialId,
+			applicationCredentialSecret,
 			authURL,
 			tenant,
 			tenantID,

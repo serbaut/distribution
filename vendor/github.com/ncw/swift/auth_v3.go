@@ -8,9 +8,10 @@ import (
 )
 
 const (
-	v3AuthMethodToken        = "token"
-	v3AuthMethodPassword     = "password"
-	v3CatalogTypeObjectStore = "object-store"
+	v3AuthMethodToken                 = "token"
+	v3AuthMethodPassword              = "password"
+	v3AuthMethodApplicationCredential = "application_credential"
+	v3CatalogTypeObjectStore          = "object-store"
 )
 
 // V3 Authentication request
@@ -19,9 +20,10 @@ const (
 type v3AuthRequest struct {
 	Auth struct {
 		Identity struct {
-			Methods  []string        `json:"methods"`
-			Password *v3AuthPassword `json:"password,omitempty"`
-			Token    *v3AuthToken    `json:"token,omitempty"`
+			Methods               []string                      `json:"methods"`
+			Password              *v3AuthPassword               `json:"password,omitempty"`
+			ApplicationCredential *v3AuthaApplicationCredential `json:"application_credential,omitempty"`
+			Token                 *v3AuthToken                  `json:"token,omitempty"`
 		} `json:"identity"`
 		Scope *v3Scope `json:"scope,omitempty"`
 	} `json:"auth"`
@@ -61,6 +63,11 @@ type v3AuthToken struct {
 
 type v3AuthPassword struct {
 	User v3User `json:"user"`
+}
+
+type v3AuthaApplicationCredential struct {
+	Id     string `json:"id"`
+	Secret string `json:"secret"`
 }
 
 // V3 Authentication response
@@ -117,9 +124,15 @@ func (auth *v3Auth) Request(c *Connection) (*http.Request, error) {
 
 	v3 := v3AuthRequest{}
 
-	if c.UserName == "" && c.UserId == "" {
+	if c.UserName == "" && c.UserId == "" && c.ApiKey != "" {
 		v3.Auth.Identity.Methods = []string{v3AuthMethodToken}
 		v3.Auth.Identity.Token = &v3AuthToken{Id: c.ApiKey}
+	} else if c.ApplicationCredentialId != "" && c.ApplicationCredentialSecret != "" {
+		v3.Auth.Identity.Methods = []string{v3AuthMethodApplicationCredential}
+		v3.Auth.Identity.ApplicationCredential = &v3AuthaApplicationCredential{
+			Id:     c.ApplicationCredentialId,
+			Secret: c.ApplicationCredentialSecret,
+		}
 	} else {
 		v3.Auth.Identity.Methods = []string{v3AuthMethodPassword}
 		v3.Auth.Identity.Password = &v3AuthPassword{
